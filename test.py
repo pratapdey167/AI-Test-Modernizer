@@ -1,17 +1,9 @@
-from app.githubpublisher import update_file
+from playwright.sync_api import Page, expect
 
-result = update_file(
-    owner="pratapdey167",
-    repo="testrepo",
-    branch="playwright-modernization",
-    file_path="README.md",
-    new_content="""
-# Updated by AI Test Modernizer
-""",
-    commit_message=
-    "Test commit from AI Test Modernizer"
-)
+def test_google(page: Page):
 
-print(
-    result["commit"]["sha"]
-)
+    page.goto("https://www.google.com")
+
+    expect(page).to_have_title(
+        "Google"
+    )

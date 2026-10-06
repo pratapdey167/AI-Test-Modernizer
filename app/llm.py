@@ -1,3 +1,31 @@
+# Using Gemini Key
+
+# import os
+
+# from dotenv import load_dotenv
+# from langchain_openai import ChatOpenAI
+# from langchain_google_genai import ChatGoogleGenerativeAI
+
+# load_dotenv()
+
+# API_KEY = os.getenv("GOOGLE_API_KEY")
+# BASE_URL = os.getenv("CAPGEMINI_GENAI_ENDPOINT")
+# MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+
+# if not API_KEY:
+#     raise RuntimeError(
+#         "Missing Capgemini Generative Engine configuration. "
+#         "Set CAPGEMINI_GENAI_API_KEY and CAPGEMINI_GENAI_ENDPOINT in your .env file."
+#     )
+
+# llm = ChatGoogleGenerativeAI(
+# model=MODEL,
+# google_api_key=API_KEY,
+# temperature=0
+# )
+
+# Using Capgemini Key
+
 import os
 
 from dotenv import load_dotenv
@@ -6,18 +34,19 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 load_dotenv()
 
-API_KEY = os.getenv("GOOGLE_API_KEY")
+API_KEY = os.getenv("CAPGEMINI_GENAI_API_KEY")
 BASE_URL = os.getenv("CAPGEMINI_GENAI_ENDPOINT")
-MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+MODEL = os.getenv("CAPGEMINI_GENAI_MODEL", "anthropic.claude-sonnet-4-6")
 
-if not API_KEY:
+if not API_KEY or not BASE_URL:
     raise RuntimeError(
         "Missing Capgemini Generative Engine configuration. "
         "Set CAPGEMINI_GENAI_API_KEY and CAPGEMINI_GENAI_ENDPOINT in your .env file."
     )
 
-llm = ChatGoogleGenerativeAI(
-model=MODEL,
-google_api_key=API_KEY,
-temperature=0
+llm = ChatOpenAI(
+    model=MODEL,
+    api_key=API_KEY,
+    base_url=BASE_URL.rstrip("/"),   # avoids '//chat/completions'
+    temperature=0,                   # deterministic output for code conversion
 )

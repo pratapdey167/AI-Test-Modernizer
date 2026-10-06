@@ -6,14 +6,13 @@ from app.flakinessanalyzer import analyze_flakiness
 from app.migrationreport import generate_report
 from app.converter import convert_to_playwright
 from app.syntaxvalidator import validate_python_syntax
+from app.testexecutor import execute_playwright_test
 from app.outputwriter import save_playwright_repo
 from app.githubpublisher import (
     create_branch,
     push_converted_files,
     generate_branch_name
 )
-
-
 from app.inputloader import (
     extract_repo_details,
     extract_github_file_details
@@ -59,6 +58,61 @@ if "push_source_type" not in st.session_state:
     st.session_state[
         "push_source_type"
     ] = ""
+
+if "execution_result" not in st.session_state:
+    st.session_state[
+        "execution_result"
+    ] = None
+
+if "playwright_code" not in st.session_state:
+    st.session_state[
+        "playwright_code"
+    ] = ""
+
+if "conversion_completed" not in st.session_state:
+    st.session_state[
+        "conversion_completed"
+    ] = False
+
+if "is_repo" not in st.session_state:
+    st.session_state[
+        "is_repo"
+    ] = False
+
+if "migration_report" not in st.session_state:
+    st.session_state[
+        "migration_report"
+    ] = ""
+
+if "flakiness_result" not in st.session_state:
+    st.session_state[
+        "flakiness_result"
+    ] = None
+
+if "syntax_valid" not in st.session_state:
+    st.session_state[
+        "syntax_valid"
+    ] = False
+
+if "repo_total_risk" not in st.session_state:
+    st.session_state[
+        "repo_total_risk"
+    ] = 0
+
+if "repo_total_issues" not in st.session_state:
+    st.session_state[
+        "repo_total_issues"
+    ] = 0
+
+if "repo_file_count" not in st.session_state:
+    st.session_state[
+        "repo_file_count"
+    ] = 0
+
+if "repo_syntax_valid" not in st.session_state:
+    st.session_state[
+        "repo_syntax_valid"
+    ] = True
 
 # -----------------------------
 # STYLING
@@ -217,6 +271,76 @@ input_type = st.radio(
     horizontal=True
 )
 
+if "last_input_type" not in st.session_state:
+
+    st.session_state[
+        "last_input_type"
+    ] = input_type
+
+if (
+    st.session_state[
+        "last_input_type"
+    ]
+    !=
+    input_type
+):
+
+    st.session_state[
+        "conversion_completed"
+    ] = False
+
+    st.session_state[
+        "execution_result"
+    ] = None
+
+    st.session_state[
+        "playwright_code"
+    ] = ""
+
+    st.session_state[
+        "migration_report"
+    ] = ""
+
+    st.session_state[
+        "flakiness_result"
+    ] = None
+
+    st.session_state[
+        "syntax_valid"
+    ] = False
+
+    st.session_state[
+        "is_repo"
+    ] = False
+
+    st.session_state[
+        "conversion_ready_for_push"
+    ] = False
+
+    st.session_state.pop(
+        "converted_files",
+        None
+    )
+    st.session_state[
+        "repo_total_risk"
+    ] = 0
+
+    st.session_state[
+        "repo_total_issues"
+    ] = 0
+
+    st.session_state[
+        "repo_file_count"
+    ] = 0
+
+    st.session_state[
+        "repo_syntax_valid"
+    ] = True
+
+    st.session_state[
+        "last_input_type"
+    ] = input_type
+
 
 legacy_code = ""
 
@@ -295,6 +419,14 @@ if convert_clicked:
         "last_branch_name"
     ] = ""
 
+    st.session_state[
+        "execution_result"
+    ] = None
+
+    st.session_state[
+        "conversion_completed"
+    ] = False
+
     st.session_state.pop(
         "converted_files",
         None
@@ -352,6 +484,18 @@ if convert_clicked:
                         )
                     )
 
+                    st.session_state[
+                        "playwright_code"
+                    ] = playwright_code
+
+                    st.session_state[
+                        "migration_report"
+                    ] = report
+
+                    st.session_state[
+                        "flakiness_result"
+                    ] = flakiness_result
+
 
                     if input_type == "GitHub File URL":
                         st.session_state[
@@ -380,12 +524,24 @@ if convert_clicked:
                         "is_repo"
                     ] = False
 
+                    st.session_state[
+                        "conversion_completed"
+                    ] = True
+
                     
                     syntax_valid = (
                         validate_python_syntax(
                             playwright_code
                         )
                     )
+
+                    st.session_state[
+                        "syntax_valid"
+                    ] = syntax_valid
+
+                    st.session_state[
+                        "conversion_ready_for_push"
+                    ] = True
 
 
                 
@@ -451,6 +607,22 @@ if convert_clicked:
                     ] = converted_files
 
                     st.session_state[
+                        "repo_total_risk"
+                    ] = total_risk
+
+                    st.session_state[
+                        "repo_total_issues"
+                    ] = total_issues
+
+                    st.session_state[
+                        "repo_file_count"
+                    ] = len(code)
+
+                    st.session_state[
+                        "repo_syntax_valid"
+                    ] = syntax_valid
+
+                    st.session_state[
                         "github_source_url"
                     ] = github_source_url
 
@@ -462,179 +634,385 @@ if convert_clicked:
                         "is_repo"
                     ] = True
 
+                    st.session_state[
+                        "conversion_ready_for_push"
+                    ] = True
 
-            st.success(
-                "✅ Migration Completed Successfully"
-            )
-
-            st.session_state[
-                "conversion_ready_for_push"
-            ] = True
-
-
-            st.divider()
-
-            st.subheader(
-                "📊 Migration Summary"
-            )
-
-            stat1, stat2, stat3 = st.columns(3)
-
-            if not is_repo:
-
-                with stat1:
-
-                    st.metric(
-                        "Legacy Risk Score",
-                        f"{flakiness_result['risk_score']}/100"
-                    )
-
-                with stat2:
-
-                    st.metric(
-                        "Issues Found",
-                        len(
-                            flakiness_result[
-                                "issues"
-                            ]
-                        )
-                    )
-
-                with stat3:
-
-                    st.metric(
-                        "Syntax Validation",
-                        "PASS" if syntax_valid else "FAIL"
-                    )
-
-            else:
-
-                avg_risk = (
-                    total_risk /
-                    len(code)
-                )
-
-                with stat1:
-
-                    st.metric(
-                        "Files Processed",
-                        len(code)
-                    )
-
-                with stat2:
-
-                    st.metric(
-                        "Total Issues",
-                        total_issues
-                    )
-
-                with stat3:
-
-                    st.metric(
-                        "Avg Risk Score",
-                        round(avg_risk)
-                    )
-
-                st.info(
-                    f"{len(code)} files converted successfully."
-                )
-
-            if syntax_valid:
-
-                st.success(
-                    "✅ Generated Playwright code is syntactically valid."
-                )
-
-            else:
-
-                st.error(
-                    "❌ Generated Playwright code contains syntax errors."
-                )
-
-            st.divider()
-
-            if not is_repo:
-
-                left_col, right_col = st.columns(
-                    [1, 2]
-                )
-
-                with left_col:
-
-                    st.subheader(
-                        "📊 Migration Report"
-                    )
-
-                    st.text(
-                        report
-                    )
-
-                with right_col:
-
-                    st.subheader(
-                        "📜 Generated Playwright Code"
-                    )
-
-                    st.code(
-                        playwright_code,
-                        language="python"
-                    )
-
-            else:
-
-                st.subheader(
-                    "📦 Repository Conversion Output"
-                )
-
-                for repo_file in converted_files:
-
-                    st.markdown(
-                        f"### {repo_file['name']}"
-                    )
-
-                    st.code(
-                        repo_file["content"],
-                        language="python"
-                    )
-
-            st.divider()
-
-            if not is_repo:
-
-                st.download_button(
-                    label="⬇ Download Playwright Code",
-                    data=playwright_code,
-                    file_name="converted_test.py",
-                    mime="text/plain",
-                    use_container_width=True
-                )
-
-            else:
-
-                zip_path = (
-                    save_playwright_repo(
-                        converted_files
-                    )
-                )
-
-                with open(
-                    zip_path,
-                    "rb"
-                ) as f:
-
-                    st.download_button(
-                        label="⬇ Download Playwright Repository",
-                        data=f.read(),
-                        file_name="playwright_repo.zip",
-                        mime="application/zip",
-                        use_container_width=True
-                    )
+                    st.session_state[
+                        "conversion_completed"
+                    ] = True
 
     except Exception as e:
 
         st.error(
             f"❌ Error: {str(e)}"
         )
+
+# -----------------------------
+# PERSISTENT SINGLE FILE RESULTS
+# -----------------------------
+
+if (
+    st.session_state.get(
+        "conversion_completed",
+        False
+    )
+    and
+    not st.session_state.get(
+        "is_repo",
+        False
+    )
+):
+
+    playwright_code = (
+        st.session_state[
+            "playwright_code"
+        ]
+    )
+
+    report = (
+        st.session_state[
+            "migration_report"
+        ]
+    )
+
+    flakiness_result = (
+        st.session_state[
+            "flakiness_result"
+        ]
+    )
+
+    syntax_valid = (
+        st.session_state[
+            "syntax_valid"
+        ]
+    )
+
+    st.success(
+        "✅ Migration Completed Successfully"
+    )
+
+    st.divider()
+
+    st.subheader(
+        "📊 Migration Summary"
+    )
+
+    stat1, stat2, stat3 = st.columns(3)
+
+    with stat1:
+
+        st.metric(
+            "Legacy Risk Score",
+            f"{flakiness_result['risk_score']}/100"
+        )
+
+    with stat2:
+
+        st.metric(
+            "Issues Found",
+            len(
+                flakiness_result[
+                    "issues"
+                ]
+            )
+        )
+
+    with stat3:
+
+        st.metric(
+            "Syntax Validation",
+            "PASS"
+            if syntax_valid
+            else "FAIL"
+        )
+
+    if syntax_valid:
+
+        st.success(
+            "✅ Generated Playwright code is syntactically valid."
+        )
+
+    else:
+
+        st.error(
+            "❌ Generated Playwright code contains syntax errors."
+        )
+
+    st.divider()
+
+    left_col, right_col = st.columns(
+        [1, 2]
+    )
+
+    with left_col:
+
+        st.subheader(
+            "📊 Migration Report"
+        )
+
+        st.text(
+            report
+        )
+
+    with right_col:
+
+        st.subheader(
+            "📜 Generated Playwright Code"
+        )
+
+        st.code(
+            playwright_code,
+            language="python"
+        )
+
+    st.divider()
+
+    st.download_button(
+        label="⬇ Download Playwright Code",
+        data=playwright_code,
+        file_name="converted_test.py",
+        mime="text/plain",
+        use_container_width=True
+    )
+
+    st.divider()
+
+    execute_clicked = st.button(
+        "▶ Execute Converted Test",
+        key="execute_test_button"
+    )
+
+    if execute_clicked:
+
+        with st.spinner(
+            "Executing Playwright Test..."
+        ):
+
+            st.session_state[
+                "execution_result"
+            ] = execute_playwright_test(
+                playwright_code
+            )
+
+    execution_result = (
+        st.session_state.get(
+            "execution_result"
+        )
+    )
+
+    if execution_result:
+
+        st.divider()
+
+        st.subheader(
+            "✅ Execution Results"
+        )
+
+        metric1, metric2, metric3 = (
+            st.columns(3)
+        )
+
+        with metric1:
+
+            st.metric(
+                "Passed",
+                execution_result[
+                    "passed"
+                ]
+            )
+
+        with metric2:
+
+            st.metric(
+                "Failed",
+                execution_result[
+                    "failed"
+                ]
+            )
+
+        with metric3:
+
+            st.metric(
+                "Skipped",
+                execution_result[
+                    "skipped"
+                ]
+            )
+
+        st.text_area(
+            "Execution Summary",
+            execution_result[
+                "execution_summary"
+            ],
+            height=100
+        )
+
+        st.text_area(
+            "Execution Log",
+            execution_result[
+                "stdout"
+            ],
+            height=300
+        )
+
+        if (
+            execution_result[
+                "stderr"
+            ]
+        ):
+
+            st.text_area(
+                "Execution Errors",
+                execution_result[
+                    "stderr"
+                ],
+                height=200
+            )
+
+# -----------------------------
+# PERSISTENT REPOSITORY RESULTS
+# -----------------------------
+
+if (
+    st.session_state.get(
+        "conversion_completed",
+        False
+    )
+    and
+    st.session_state.get(
+        "is_repo",
+        False
+    )
+):
+
+    converted_files = (
+        st.session_state.get(
+            "converted_files",
+            []
+        )
+    )
+
+    if converted_files:
+
+        file_count = (
+            st.session_state[
+                "repo_file_count"
+            ]
+        )
+
+        total_issues = (
+            st.session_state[
+                "repo_total_issues"
+            ]
+        )
+
+        total_risk = (
+            st.session_state[
+                "repo_total_risk"
+            ]
+        )
+
+        repo_syntax_valid = (
+            st.session_state[
+                "repo_syntax_valid"
+            ]
+        )
+
+        avg_risk = (
+            round(
+                total_risk /
+                file_count
+            )
+            if file_count > 0
+            else 0
+        )
+
+        st.success(
+            "✅ Repository Conversion Completed Successfully"
+        )
+
+        st.divider()
+
+        st.subheader(
+            "📊 Repository Migration Summary"
+        )
+
+        stat1, stat2, stat3 = st.columns(3)
+
+        with stat1:
+
+            st.metric(
+                "Files Processed",
+                file_count
+            )
+
+        with stat2:
+
+            st.metric(
+                "Total Issues",
+                total_issues
+            )
+
+        with stat3:
+
+            st.metric(
+                "Avg Risk Score",
+                avg_risk
+            )
+
+        if repo_syntax_valid:
+
+            st.success(
+                "✅ All generated Playwright files passed syntax validation."
+            )
+
+        else:
+
+            st.error(
+                "❌ One or more generated Playwright files contain syntax errors."
+            )
+
+        st.divider()
+
+        st.subheader(
+            "📦 Repository Conversion Output"
+        )
+
+        for repo_file in converted_files:
+
+            st.markdown(
+                f"### {repo_file['name']}"
+            )
+
+            st.code(
+                repo_file[
+                    "content"
+                ],
+                language="python"
+            )
+
+        st.divider()
+
+        zip_path = (
+            save_playwright_repo(
+                converted_files
+            )
+        )
+
+        with open(
+            zip_path,
+            "rb"
+        ) as f:
+
+            st.download_button(
+                label="⬇ Download Playwright Repository",
+                data=f.read(),
+                file_name="playwright_repo.zip",
+                mime="application/zip",
+                use_container_width=True
+            )
+
 if (
     input_type ==
     st.session_state.get(
