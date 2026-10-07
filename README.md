@@ -581,7 +581,21 @@ Use this sequence during demonstrations.
 
 ---
 
-## Scenario 2 – GitHub File
+## Scenario 2 – Upload File
+ 
+1. Select **Upload File**
+2. Upload a Selenium/Cypress test file
+3. Click **Convert to Playwright**
+4. Review:
+- Risk Score
+- Migration Report
+- Syntax Validation
+5. Execute generated Playwright test
+6. Download converted file
+
+---
+
+## Scenario 3 – GitHub File
 
 1. Select "GitHub File URL"
 2. Enter test file URL
@@ -592,7 +606,7 @@ Use this sequence during demonstrations.
 
 ---
 
-## Scenario 3 – GitHub Repository
+## Scenario 4 – GitHub Repository
 
 1. Select "GitHub Repository URL"
 2. Enter repository URL
