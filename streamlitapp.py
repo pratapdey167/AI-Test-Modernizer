@@ -114,6 +114,11 @@ if "repo_syntax_valid" not in st.session_state:
         "repo_syntax_valid"
     ] = True
 
+if "playwright_version" not in st.session_state:
+    st.session_state[
+        "playwright_version"
+    ] = "Latest"
+
 # -----------------------------
 # STYLING
 # -----------------------------
@@ -389,6 +394,25 @@ elif input_type == "GitHub Repository URL":
 
 st.divider()
 
+st.subheader(
+    "⚙️ Target Configuration"
+)
+
+playwright_version = st.selectbox(
+    "Playwright Version",
+    [
+        "Latest",
+        "1.50",
+        "1.49",
+        "1.48",
+        "1.47"
+    ]
+)
+
+st.session_state[
+    "playwright_version"
+] = playwright_version
+
 convert_clicked = st.button(
     "🚀 Convert to Playwright"
 )
@@ -480,7 +504,8 @@ if convert_clicked:
 
                     playwright_code = (
                         convert_to_playwright(
-                            code
+                            code,
+                            playwright_version
                         )
                     )
 
@@ -584,7 +609,8 @@ if convert_clicked:
 
                         converted_code = (
                             convert_to_playwright(
-                                file_code
+                                file_code,
+                                playwright_version
                             )
                         )
 

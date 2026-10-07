@@ -13,6 +13,7 @@ migration_chain = (
 
 def convert_to_playwright(
     legacy_code: str,
+    playwright_version: str = "Latest",
     dependency_context: str = ""
 ):
     """
@@ -37,6 +38,7 @@ LEGACY CODE
 
     return migration_chain.invoke(
         {
-            "legacy_code": full_context
+            "legacy_code": full_context,
+            "playwright_version": playwright_version
         }
     )

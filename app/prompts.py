@@ -2,7 +2,10 @@ from langchain_core.prompts import PromptTemplate
 
 
 migration_prompt = PromptTemplate(
-    input_variables=["legacy_code"],
+    input_variables=[
+        "legacy_code",
+        "playwright_version"
+    ],
     template="""
 You are a Principal Playwright Architect and Senior QA Automation Engineer.
 
@@ -31,6 +34,19 @@ GENERAL REQUIREMENTS
 10. Preserve all assertions.
 11. Preserve all navigation steps.
 12. Do not simplify the test case.
+
+TARGET PLAYWRIGHT VERSION
+
+Requested Playwright Version:
+{playwright_version}
+
+VERSION COMPATIBILITY RULES
+
+1. Generate code compatible with the requested Playwright version.
+2. Avoid APIs introduced after the selected version.
+3. If "Latest" is selected, use the newest Playwright best practices.
+4. Prefer APIs available in the requested version.
+5. Preserve functionality if a newer API is unavailable.
 
 PLAYWRIGHT REQUIREMENTS
 

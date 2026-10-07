@@ -1,9 +1,35 @@
-from playwright.sync_api import Page, expect
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 
-def test_google(page: Page):
+driver = webdriver.Chrome()
 
-    page.goto("https://www.google.com")
+driver.get(
+    "https://www.saucedemo.com/"
+)
 
-    expect(page).to_have_title(
-        "Google"
-    )
+driver.find_element(
+    By.ID,
+    "user-name"
+).send_keys(
+    "standard_user"
+)
+
+driver.find_element(
+    By.ID,
+    "password"
+).send_keys(
+    "secret_sauce"
+)
+
+driver.find_element(
+    By.ID,
+    "login-button"
+).click()
+
+assert (
+    "inventory"
+    in
+    driver.current_url.lower()
+)
+
+driver.quit()
