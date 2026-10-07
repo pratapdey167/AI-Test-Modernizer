@@ -1,193 +1,428 @@
 # 🚀 AI Test Modernizer
 
-An AI-powered test modernization platform that converts legacy Selenium and Cypress automation scripts into production-ready Playwright tests.
+AI Test Modernizer is an AI-powered test modernization platform that helps teams migrate legacy Selenium and Cypress automation tests to Playwright with minimal manual effort.
+
+The platform analyzes existing automation code, identifies flaky patterns, generates migration insights, converts tests to Playwright, validates generated code, executes converted tests, and publishes modernized tests directly to GitHub.
 
 ---
 
-## 📌 Overview
+# 📖 Overview
 
-AI Test Modernizer helps QA engineers and automation teams accelerate framework migration by:
+Modern test automation teams often face challenges such as:
 
-- Detecting flaky test patterns
-- Generating migration insights
-- Converting Selenium/Cypress tests to Playwright
-- Validating generated code
-- Supporting multiple input sources
+- Large Selenium codebases
+- Legacy Cypress repositories
+- Flaky tests
+- High maintenance costs
+- Slow framework migration initiatives
 
-The tool provides both:
+Migrating manually to Playwright can take weeks or months.
 
-- Command Line Interface (CLI)
-- Streamlit Web UI
-
----
-
-## ✨ Features
-
-### Supported Inputs
-
-✅ Paste Selenium/Cypress Code
-
-✅ Upload Python Test Files
-
-✅ Import Tests from GitHub
+AI Test Modernizer accelerates the migration process using AI-assisted conversion and automated analysis.
 
 ---
 
-### Flakiness Analysis
+# 🎯 What This Tool Does
 
-Detects common flaky patterns such as:
+The platform provides an end-to-end modernization workflow.
+
+```
+Legacy Test
+     │
+     ▼
+Code Validation
+     │
+     ▼
+Flakiness Analysis
+     │
+     ▼
+Migration Report
+     │
+     ▼
+AI Conversion
+     │
+     ▼
+Playwright Validation
+     │
+     ▼
+Optional Execution
+     │
+     ▼
+Download / GitHub Push
+```
+
+---
+
+# ✨ Features
+
+## ✅ Flakiness Detection
+
+Identifies common anti-patterns such as:
 
 - Hard waits (`time.sleep`)
-- Brittle XPath locators
+- Brittle locators
+- Synchronization issues
 - Maintainability concerns
+- Legacy automation patterns
 
-Generates a Legacy Risk Score to help prioritize modernization efforts.
+Generates a risk score to help prioritize modernization.
 
 ---
 
-### AI-Powered Conversion
+## ✅ Migration Report
+
+Automatically generates insights including:
+
+- Risk score
+- Identified issues
+- Improvement recommendations
+- Modernization benefits
+
+---
+
+## ✅ AI-Powered Conversion
 
 Automatically converts:
 
-```text
+```
 Selenium
-        ↓
+      ↓
 Playwright
 
 Cypress
-        ↓
+      ↓
 Playwright
 ```
 
 Generated Playwright code follows modern best practices:
 
-- Auto-waiting
-- Semantic locators
+- Auto waiting
+- Better locator strategies
 - Web-first assertions
 - Pytest-compatible structure
 
 ---
 
-### Migration Report
+## ✅ Syntax Validation
 
-Provides:
+Validates generated Playwright code before download:
 
-- Identified issues
-- Risk score
-- Modernization recommendations
-- Expected migration benefits
-
----
-
-### Syntax Validation
-
-Automatically validates generated Playwright code to ensure:
-
-- Python syntax correctness
-- Playwright API validity
-- Executable output
+- Python syntax validation
+- Code generation sanity checks
+- Execution readiness checks
 
 ---
 
-### Download Support
+## ✅ Playwright Test Execution
 
-Download generated Playwright tests directly from the web interface.
+Execute generated Playwright code directly from the UI.
+
+Execution results include:
+
+- Passed count
+- Failed count
+- Skipped count
+- Execution summary
+- Execution logs
+- Error logs
 
 ---
 
-## 🏗 Architecture
+## ✅ GitHub Integration
 
-```text
-User Input
-     │
-     ├── Paste Code
-     ├── Upload File
-     └── GitHub URL
-             │
-             ▼
-      Source Handler
-             │
-             ▼
-         Validation
-             │
-             ▼
-   Flakiness Analyzer
-             │
-             ▼
-    Migration Report
-             │
-             ▼
-      AI Conversion
-             │
-             ▼
-    Syntax Validation
-             │
-             ▼
-    Playwright Output
-             │
-             ▼
-   Download / Export
+Supports:
+
+### GitHub File Conversion
+
+Convert a single test file directly from GitHub.
+
+### GitHub Repository Conversion
+
+Convert all supported test files in a repository.
+
+### GitHub Publishing
+
+Automatically:
+
+```
+Create Branch
+      ↓
+Push Converted Files
+      ↓
+Generate Branch URL
+      ↓
+Ready For Pull Request
 ```
 
 ---
 
-## 📂 Project Structure
+# 🌐 Supported Input Methods
 
-```text
+## 1. Paste Code
+
+Paste Selenium or Cypress code directly into the application.
+
+### Use Case
+
+Quick proof-of-concept conversions.
+
+---
+
+## 2. Upload File
+
+Upload supported test files.
+
+### Supported Types
+
+```
+.py
+.js
+.ts
+```
+
+---
+
+## 3. GitHub File URL
+
+Convert a single GitHub-hosted test file.
+
+Example:
+
+```
+https://github.com/user/repository/blob/main/tests/login.py
+```
+
+---
+
+## 4. GitHub Repository URL
+
+Convert an entire repository.
+
+Example:
+
+```
+https://github.com/user/repository/tree/main
+```
+
+---
+
+# 🔄 End-to-End Workflow
+
+## Single File Workflow
+
+```
+Paste Code / Upload File / GitHub File
+            │
+            ▼
+      Load Source
+            │
+            ▼
+     Code Validation
+            │
+            ▼
+   Flakiness Analysis
+            │
+            ▼
+   Migration Report
+            │
+            ▼
+ Convert To Playwright
+            │
+            ▼
+   Syntax Validation
+            │
+            ▼
+   Playwright Output
+            │
+      ┌─────┼─────┐
+      ▼     ▼     ▼
+ Download Execute Push
+```
+
+---
+
+## Repository Workflow
+
+```
+GitHub Repository
+         │
+         ▼
+ Load Repository Files
+         │
+         ▼
+ Analyze Every File
+         │
+         ▼
+ Convert Every File
+         │
+         ▼
+ Repository Summary
+         │
+         ▼
+ Download ZIP
+         │
+         ▼
+ Push To GitHub
+```
+
+---
+
+# 📊 Migration Metrics
+
+The application generates migration statistics.
+
+## Single File Metrics
+
+- Legacy Risk Score
+- Issues Found
+- Syntax Validation Status
+
+---
+
+## Repository Metrics
+
+- Files Processed
+- Total Issues
+- Average Risk Score
+- Syntax Validation Status
+
+---
+
+# 🧪 Playwright Execution Workflow
+
+Execution is supported only for single-file conversions.
+
+```
+Convert
+   │
+   ▼
+Validate
+   │
+   ▼
+Execute
+   │
+   ▼
+Pytest Execution
+   │
+   ▼
+Execution Summary
+```
+
+Execution results include:
+
+```
+Passed: X
+Failed: Y
+Skipped: Z
+```
+
+With:
+
+- Full logs
+- Error details
+- Execution summary
+
+---
+
+# 🧱 Solution Architecture
+
+```
+streamlitapp.py
+       │
+       ▼
+sourcehandler.py
+       │
+       ▼
+validator.py
+       │
+       ▼
+flakinessanalyzer.py
+       │
+       ▼
+migrationreport.py
+       │
+       ▼
+converter.py
+       │
+       ▼
+syntaxvalidator.py
+       │
+       ▼
+testexecutor.py
+       │
+       ▼
+githubpublisher.py
+```
+
+---
+
+# 📁 Project Structure
+
+```
 test-modernizer/
-
+│
 ├── README.md
-├── main.py
 ├── streamlitapp.py
+├── main.py
+│
+├── app/
+│   ├── converter.py
+│   ├── validator.py
+│   ├── sourcehandler.py
+│   ├── sourcedetector.py
+│   ├── flakinessanalyzer.py
+│   ├── migrationreport.py
+│   ├── syntaxvalidator.py
+│   ├── testexecutor.py
+│   ├── githubpublisher.py
+│   ├── inputloader.py
+│   ├── prompts.py
+│   └── llm.py
 │
 ├── outputs/
-│   └── converted_test.py
 │
-└── app/
-    ├── converter.py
-    ├── flakiness_analyzer.py
-    ├── inputloader.py
-    ├── llm.py
-    ├── migration_report.py
-    ├── prompts.py
-    ├── sourcedetector.py
-    ├── sourcehandler.py
-    ├── syntax_validator.py
-    └── validator.py
+└── requirements.txt
 ```
 
 ---
 
-## ⚙️ Installation
+# ⚙️ Configuration
 
-### Clone Repository
+## Required Python Version
 
-```bash
-git clone <repository-url>
-cd test-modernizer
+Recommended:
+
+```
+Python 3.10+
 ```
 
-### Create Virtual Environment
+---
+
+## Create Virtual Environment
 
 ```bash
 python -m venv venv
 ```
 
-### Activate Virtual Environment
+---
 
-Windows:
+## Activate Environment
+
+### Windows
 
 ```bash
 venv\Scripts\activate
 ```
 
-Linux/macOS:
+### Linux / macOS
 
 ```bash
 source venv/bin/activate
 ```
 
-### Install Dependencies
+---
+
+## Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -195,39 +430,65 @@ pip install -r requirements.txt
 
 ---
 
-## ▶️ Running the Application
+# 🔑 Environment Variables
 
-### Streamlit UI
+Create a `.env` file.
+
+Example:
+
+```env
+GOOGLE_API_KEY=<your-gemini-api-key>
+
+GITHUB_TOKEN=<github-personal-access-token>
+```
+
+---
+
+## Google Gemini API Key
+
+Required for:
+
+- AI Conversion
+- Migration Recommendations
+
+---
+
+## GitHub Personal Access Token
+
+Required for:
+
+- Create Branch
+- Push Converted Files
+
+Recommended permissions:
+
+```
+repo
+contents:write
+pull_requests:write
+```
+
+---
+
+# ▶ Running The Application
+
+Launch Streamlit UI:
 
 ```bash
 streamlit run streamlitapp.py
 ```
 
-Open:
+Default URL:
 
-```text
+```
 http://localhost:8501
 ```
 
 ---
 
-### Command Line Interface
+# 🔍 Example Conversion
 
-```bash
-python main.py
-```
-
-You can provide:
-
-- A local file path
-- A GitHub file URL
-- Selenium/Cypress code
-
----
-
-## 🧪 Example
-
-### Legacy Selenium
+## Selenium
 
 ```python
 driver.find_element(
@@ -246,7 +507,9 @@ driver.find_element(
 ).click()
 ```
 
-### Generated Playwright
+---
+
+## Playwright
 
 ```python
 page.get_by_placeholder(
@@ -265,17 +528,17 @@ page.get_by_role(
 
 ---
 
-## 🛠 Supported Frameworks
+# 🛠 Supported Frameworks
 
-| Framework | Support |
-|------------|----------|
+| Framework | Supported |
+|------------|------------|
 | Selenium | ✅ |
 | Cypress | ✅ |
 | Playwright Output | ✅ |
 
 ---
 
-## 💻 Technology Stack
+# 💻 Technology Stack
 
 - Python
 - Streamlit
@@ -283,38 +546,89 @@ page.get_by_role(
 - Google Gemini
 - Playwright
 - Pytest
+- GitHub API
 
 ---
 
-## 🎯 Key Benefits
+# 🎯 Benefits
 
 - Faster framework migration
 - Reduced manual effort
-- Playwright best practices
+- Lower modernization risk
+- Improved test reliability
 - Flakiness reduction
-- Automated modernization workflow
+- GitHub-ready output
+- Execution validation before commit
 
 ---
 
-## 🚀 Future Enhancements
+# 📋 Demo Walkthrough
 
-- Batch test conversion
-- Repository-wide migration
-- Playwright execution validation
-- Migration quality scoring
+Use this sequence during demonstrations.
+
+## Scenario 1 – Paste Code
+
+1. Open application
+2. Select "Paste Code"
+3. Paste Selenium script
+4. Click "Convert to Playwright"
+5. Review Migration Summary
+6. Review Migration Report
+7. Review Generated Playwright Code
+8. Execute Converted Test
+9. Review Execution Results
+10. Download Code
+
+---
+
+## Scenario 2 – GitHub File
+
+1. Select "GitHub File URL"
+2. Enter test file URL
+3. Convert
+4. Review migration details
+5. Push to GitHub
+6. Open generated branch
+
+---
+
+## Scenario 3 – GitHub Repository
+
+1. Select "GitHub Repository URL"
+2. Enter repository URL
+3. Convert repository
+4. Review:
+   - Files Processed
+   - Total Issues
+   - Average Risk Score
+5. Download ZIP
+6. Push converted repository to GitHub
+
+---
+
+# 🚀 Future Enhancements
+
+Potential roadmap items:
+
 - CI/CD integration
-- Exportable PDF reports
+- Pull request automation
+- Playwright test generation
+- Conversion quality scoring
+- Dashboard analytics
+- PDF reporting
+- Conversion history
+- Enterprise reporting
 
 ---
 
-## 👨‍💻 Author
+# 👨‍💻 Author
 
-**Pratap Dey**
-
-Senior Consultant
-
+**Pratap Dey**  
+Senior Consultant  
 Capgemini
 
 ---
 
-⭐ If you found this project useful, consider giving it a star.
+# ⭐ Support
+
+If you find this project useful, consider starring the repository and contributing improvements.
